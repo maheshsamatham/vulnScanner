@@ -6,3 +6,4 @@ __pycache__/
 *.sqlite
 *.pdf
 .DS_Store
+Detection-4/
