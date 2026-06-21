@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VulnScanner — Vulnerability Management Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon">&#9760;</span> VulnScanner
+        </a>
+        <div class="nav-links">
+            <a href="/" class="active">Dashboard</a>
+            <a href="/scan-history">Scan History</a>
+            <a href="/cve-detail">CVE Detail</a>
+        </div>
+        <div class="nav-user">
+            <span class="username">{{ session.username }}</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Scanner Status -->
+    <div class="scanner-status mb-4 animate-in">
+        <span>Scanner Engine:</span>
+        {% if scanners.openvas %}
+        <span class="scanner-dot openvas"></span>
+        <span class="scanner-badge openvas">OpenVAS Active</span>
+        {% else %}
+        <span class="scanner-dot inactive"></span>
+        <span class="scanner-badge" style="background:rgba(239,68,68,0.08);color:#ef4444;border:1px solid rgba(239,68,68,0.15);">OpenVAS Not Available</span>
+        {% endif %}
+    </div>
+
+    <!-- Scan Form -->
+    <div class="scan-card animate-in">
+        <form id="manual-scan-form" onsubmit="return triggerManualScan(event)">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">Target URL</label>
+                    <input type="text" class="form-control" id="target-host"
+                           placeholder="https://example.com" required autocomplete="url"
+                           value="http://testphp.vulnweb.com">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Scan Name</label>
+                    <input type="text" class="form-control" id="target-name"
+                           placeholder="My Scan" value="Quick Scan">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-scan" id="scan-btn">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Scan Now</span>
+                    </button>
+                </div>
+            </div>
+            <div id="scan-status"></div>
+            <div class="scan-progress" id="scan-progress">
+                <div class="progress-track"><div class="progress-bar"></div></div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Per-Target Sections -->
+    {% if targets_stats %}
+    {% for t in targets_stats %}
+    <div class="target-section mb-4 animate-in" id="target-{{ t.id }}">
+        <!-- Target Header -->
+        <div class="target-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                <div>
+                    <h3>{{ t.name }}</h3>
+                    <span class="text-muted text-mono" style="font-size:0.75rem;">{{ t.host }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;font-size:0.78rem;">
+                    <span style="color:var(--text-muted);">Latest Scan</span>
+                    {% set target_scans = scans_with_vulns | selectattr("scan.target_id", "equalto", t.id) | list %}
+                    {% if target_scans %}
+                    {% set latest = target_scans[0] %}
+                    <span class="badge badge-{{ latest.scan.status|lower }}">{{ latest.scan.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Hero -->
+        <div class="security-hero">
+            {% set target_scans = scans_with_vulns | selectattr("scan.target_id", "equalto", t.id) | list %}
+            {% if target_scans %}
+            {% set latest = target_scans[0] %}
+            {% set svulns = latest.vulns %}
+            {% if svulns | length == 0 %}
+            <div class="secure-shield safe">&#128737;</div>
+            <div class="status-title secure">&#10003; {{ t.name }} Appears Secure</div>
+            <div class="status-subtitle">Current scan found no vulnerabilities</div>
+            {% else %}
+            <div class="secure-shield danger">&#9888;</div>
+            <div class="status-title vulnerable">{{ svulns | length }} Vulnerability{{ 'ies' if svulns | length != 1 else 'y' }} Found</div>
+            <div class="status-subtitle">Review and remediate below</div>
+            {% endif %}
+            {% else %}
+            <div class="secure-shield" style="border:2px solid rgba(100,116,139,0.2);background:rgba(100,116,139,0.05);">&#128736;</div>
+            <div class="status-title" style="color:var(--text-secondary);">No Scans Yet</div>
+            <div class="status-subtitle">Run a scan to see results here</div>
+            {% endif %}
+        </div>
+
+        <!-- KPI Cards -->
+        {% set target_scans = scans_with_vulns | selectattr("scan.target_id", "equalto", t.id) | list %}
+        {% if target_scans %}
+        {% set latest = target_scans[0] %}
+        {% set s = latest.scan %}
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="kpi-card critical">
+                    <div class="kpi-label">Critical</div>
+                    <div class="kpi-value">{{ s.total_critical }}</div>
+                    <div class="kpi-sub">Immediate action required</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card high">
+                    <div class="kpi-label">High</div>
+                    <div class="kpi-value">{{ s.total_high }}</div>
+                    <div class="kpi-sub">Priority remediation</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card medium">
+                    <div class="kpi-label">Medium</div>
+                    <div class="kpi-value">{{ s.total_medium }}</div>
+                    <div class="kpi-sub">Schedule remediation</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card low">
+                    <div class="kpi-label">Low</div>
+                    <div class="kpi-value">{{ s.total_low }}</div>
+                    <div class="kpi-sub">Informational</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Scan Table -->
+        {% set target_scans = scans_with_vulns | selectattr("scan.target_id", "equalto", t.id) | list %}
+        {% if target_scans %}
+        {% set item = target_scans[0] %}
+        {% set s = item.scan %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <div style="display:flex;align-items:center;gap:10px;font-size:0.75rem;flex-wrap:wrap;">
+                    <span class="scanner-badge {{ s.get('scan_type', 'nmap') }}">{{ s.get('scan_type', 'openvas')|upper }}</span>
+                    <span class="text-mono" style="color:var(--text-muted);">{{ s.scan_date[:19] }}</span>
+                    <span class="badge badge-{{ s.status|lower }}">{{ s.status }}</span>
+                    <span class="badge badge-critical">{{ s.total_critical }}C</span>
+                    <span class="badge badge-high">{{ s.total_high }}H</span>
+                    <span class="badge badge-medium">{{ s.total_medium }}M</span>
+                    <span class="badge badge-low">{{ s.total_low }}L</span>
+                </div>
+                <div class="btn-group">
+                    <a href="/cve-detail?scan_id={{ s.id }}" class="btn btn-xs btn-primary">View CVEs</a>
+                    <a href="/export/csv?scan_id={{ s.id }}" class="btn btn-xs btn-outline" data-tooltip="Download CSV">CSV</a>
+                    <a href="/export/pdf?scan_id={{ s.id }}" class="btn btn-xs btn-outline" data-tooltip="Download PDF">PDF</a>
+                    <button class="btn btn-xs btn-outline" onclick="emailReport({{ s.id }}, 'csv')">Email</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if item.vulns %}
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>CVE ID</th>
+                                <th>Name</th>
+                                <th>Severity</th>
+                                <th>CVSS</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in item.vulns %}
+                            <tr>
+                                <td><code>{{ v.cve_id }}</code></td>
+                                <td style="max-width:200px;">{{ v.name[:60] }}</td>
+                                <td><span class="badge badge-{{ v.severity|lower }}">{{ v.severity }}</span></td>
+                                <td class="text-mono">{{ v.cvss_score }}</td>
+                                <td style="max-width:200px;font-size:0.78rem;color:var(--text-secondary);">{{ v.description[:100] }}{% if v.description|length > 100 %}...{% endif %}</td>
+                                <td><span class="badge badge-{{ 'fixed' if v.status == 'Fixed' else 'open' }}">{{ v.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <span class="empty-icon">&#128737;</span>
+                    <div class="empty-title">No Vulnerabilities Found</div>
+                    <div class="empty-desc">Target appears secure</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="text-align:right;margin-top:4px;">
+            <a href="/scan-history" class="btn btn-xs btn-outline">View All Scans &rarr;</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <!-- No Targets -->
+    <div class="security-hero animate-in">
+        <div class="secure-shield safe" style="border-color:rgba(56,189,248,0.2);background:rgba(56,189,248,0.05);animation:none;">&#128736;</div>
+        <div class="status-title text-gradient">Web Vulnerability Scanner</div>
+        <div class="status-subtitle">Enter a target URL to scan for vulnerabilities</div>
+    </div>
+    <div class="card animate-in">
+        <div class="card-body">
+            <div class="empty-state">
+                <span class="empty-icon">&#128214;</span>
+                <div class="empty-title">No Scans Yet</div>
+                <div class="empty-desc">Run a scan from the form above to see results here</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Alert Log -->
+    <div class="row mb-4 animate-in">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Alert Log</div>
+                <div class="card-body p-0">
+                    {% if alerts %}
+                    <div class="alert-log">
+                        {% for a in alerts %}
+                        <div class="alert-item">
+                            <span class="alert-time">{{ a.sent_at[:19] }}</span>
+                            <code style="font-size:0.72rem;">{{ a.cve_id or 'N/A' }}</code>
+                            <span style="font-size:0.75rem;color:var(--text-muted);margin-left:auto;">{{ a.recipient }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">&#128276;</span>
+                        <div class="empty-title">No Alerts</div>
+                        <div class="empty-desc">Configure email alerts to get notified</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function emailReport(scanId, type) {
+        const resp = await fetch('/send-report', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'scan_id=' + (scanId || '') + '&type=' + type,
+        });
+        const data = await resp.json();
+        if (data.status === 'ok') {
+            alert('Report sent to your email!');
+        } else {
+            alert('Failed: ' + (data.message || 'unknown'));
+        }
+    }
+
+    async function pollScanStatus(scanId, onComplete) {
+        const interval = setInterval(async () => {
+            try {
+                const resp = await fetch('/api/scan-status/' + scanId);
+                const data = await resp.json();
+                if (data.error) { clearInterval(interval); onComplete(null); return; }
+                if (data.status === 'Done' || data.status === 'Stopped' || data.status === 'Failed' || data.status === 'Error') {
+                    clearInterval(interval);
+                    onComplete(data);
+                }
+            } catch (e) { clearInterval(interval); onComplete(null); }
+        }, 3000);
+    }
+
+    async function triggerManualScan(event) {
+        event.preventDefault();
+        const host = document.getElementById('target-host').value.trim();
+        const name = document.getElementById('target-name').value || 'Quick Scan';
+        const btn = document.getElementById('scan-btn');
+        const status = document.getElementById('scan-status');
+        const progress = document.getElementById('scan-progress');
+
+        if (!host) { alert('Please enter a target URL'); return; }
+
+        btn.classList.add('loading');
+        btn.disabled = true;
+        status.className = 'show scanning';
+        status.innerHTML = '&#8987; Scanning <strong>' + host + '</strong>';
+        progress.classList.add('show');
+
+        try {
+            const resp = await fetch('/api/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({host, name}),
+            });
+            const data = await resp.json();
+
+            if (data.status === 'ok') {
+                status.className = 'show success';
+                status.innerHTML = '&#10003; Scan started — monitoring progress...';
+
+                pollScanStatus(data.scan_id, function(result) {
+                    if (result) {
+                        const total = (result.total_critical || 0) + (result.total_high || 0)
+                                   + (result.total_medium || 0) + (result.total_low || 0);
+                        if (total === 0) {
+                            status.innerHTML = '&#10003; Scan complete — <strong>target appears secure</strong>';
+                        } else {
+                            status.innerHTML = '&#10003; Scan complete — <strong>' + total + ' vulnerability' + (total !== 1 ? 'ies' : 'y') + '</strong> '
+                                + '(' + (result.total_critical || 0) + 'C / ' + (result.total_high || 0) + 'H / '
+                                + (result.total_medium || 0) + 'M / ' + (result.total_low || 0) + 'L)';
+                        }
+                        status.className = 'show success';
+                        progress.classList.remove('show');
+                        setTimeout(() => location.reload(), 3000);
+                    } else {
+                        status.innerHTML = '&#10003; Scan completed — reloading...';
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                });
+            } else {
+                status.className = 'show error';
+                status.innerHTML = '&#10007; Scan failed: ' + (data.message || 'unknown');
+                progress.classList.remove('show');
+            }
+        } catch (e) {
+            status.className = 'show error';
+            status.innerHTML = '&#10007; Error: ' + e.message;
+            progress.classList.remove('show');
+        }
+
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+</script>
+</body>
+</html>

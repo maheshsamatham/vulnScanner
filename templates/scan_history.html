@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scan History — VulnScanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon">&#9760;</span> VulnScanner
+        </a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/scan-history" class="active">Scan History</a>
+            <a href="/cve-detail">CVE Detail</a>
+        </div>
+        <div class="nav-user">
+            <span class="username">{{ session.username }}</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="page-header animate-in">
+        <div>
+            <h2>Scan History</h2>
+            <div class="page-subtitle">Complete record of all vulnerability scans performed</div>
+        </div>
+    </div>
+
+    <div class="card animate-in">
+        <div class="card-body p-0">
+            {% if scans %}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Target</th>
+                            <th>Scanner</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Critical</th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in scans %}
+                        <tr>
+                            <td><code>{{ s.id }}</code></td>
+                            <td>
+                                <strong>{{ s.target_name }}</strong><br>
+                                <span class="text-muted text-mono" style="font-size:0.72rem;">{{ s.target_host }}</span>
+                            </td>
+                            <td>
+                                <span class="scanner-badge {{ s.get('scan_type', 'nmap') }}">
+                                    {{ s.get('scan_type', 'nmap')|upper }}
+                                </span>
+                            </td>
+                            <td class="text-mono" style="font-size:0.78rem;color:var(--text-muted);">{{ s.scan_date[:19] }}</td>
+                            <td><span class="badge badge-{{ s.status|lower }}">{{ s.status }}</span></td>
+                            <td><span class="badge badge-critical">{{ s.total_critical }}</span></td>
+                            <td><span class="badge badge-high">{{ s.total_high }}</span></td>
+                            <td><span class="badge badge-medium">{{ s.total_medium }}</span></td>
+                            <td><span class="badge badge-low">{{ s.total_low }}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="/cve-detail?scan_id={{ s.id }}" class="btn btn-xs btn-primary">CVEs</a>
+                                    <a href="/export/csv?scan_id={{ s.id }}" class="btn btn-xs btn-outline" data-tooltip="Download CSV">CSV</a>
+                                    <a href="/export/pdf?scan_id={{ s.id }}" class="btn btn-xs btn-outline" data-tooltip="Download PDF">PDF</a>
+                                    <button class="btn btn-xs btn-outline" onclick="emailReport({{ s.id }}, 'csv')">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon">&#128214;</span>
+                <div class="empty-title">No Scans Yet</div>
+                <div class="empty-desc">Run a scan from the dashboard to see history here</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    async function emailReport(scanId, type) {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = '...';
+        try {
+            const resp = await fetch('/send-report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'scan_id=' + scanId + '&type=' + type,
+            });
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                btn.textContent = 'Sent!';
+                btn.style.borderColor = '#10b981';
+                btn.style.color = '#10b981';
+            } else {
+                alert('Failed: ' + (data.message || 'unknown'));
+                btn.textContent = type === 'csv' ? 'CSV' : 'PDF';
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert('Error: ' + e.message);
+            btn.textContent = type === 'csv' ? 'CSV' : 'PDF';
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

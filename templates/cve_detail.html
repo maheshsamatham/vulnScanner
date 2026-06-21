@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CVE Detail — VulnScanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon">&#9760;</span> VulnScanner
+        </a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/scan-history">Scan History</a>
+            <a href="/cve-detail" class="active">CVE Detail</a>
+        </div>
+        <div class="nav-user">
+            <span class="username">{{ session.username }}</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="page-header animate-in">
+        <div>
+            <h2>CVE Breakdown</h2>
+            <div class="page-subtitle">
+                Vulnerabilities for <strong>{{ scan.target_name }}</strong> ({{ scan.target_host }})
+                &middot; Scanned {{ scan.scan_date[:19] }}
+                &middot; <span class="scanner-badge {{ scan.get('scan_type', 'nmap') }}">{{ scan.get('scan_type', 'nmap')|upper }}</span>
+            </div>
+        </div>
+        <div class="btn-group">
+            <a href="/export/csv?scan_id={{ request.args.get('scan_id') }}" class="btn btn-sm btn-success">Export CSV</a>
+            <a href="/export/pdf?scan_id={{ request.args.get('scan_id') }}" class="btn btn-sm btn-danger">Export PDF</a>
+            <button class="btn btn-sm btn-info" onclick="emailReport('csv')">Email CSV</button>
+            <button class="btn btn-sm btn-info" onclick="emailReport('pdf')">Email PDF</button>
+        </div>
+    </div>
+
+    <div class="card animate-in">
+        <div class="card-body p-0">
+            {% if vulns %}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>CVE ID</th>
+                            <th>Name</th>
+                            <th>Severity</th>
+                            <th>CVSS</th>
+                            <th>Description</th>
+                            <th>Solution</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in vulns %}
+                        <tr>
+                            <td><code>{{ v.cve_id }}</code></td>
+                            <td style="max-width:200px;">{{ v.name[:80] }}</td>
+                            <td><span class="badge badge-{{ v.severity|lower }}">{{ v.severity }}</span></td>
+                            <td class="text-mono">{{ v.cvss_score }}</td>
+                            <td style="max-width:250px;font-size:0.78rem;color:var(--text-secondary);">{{ v.description[:150] }}{% if v.description|length > 150 %}...{% endif %}</td>
+                            <td style="max-width:200px;font-size:0.78rem;color:var(--text-secondary);">{{ v.solution[:100] }}{% if v.solution|length > 100 %}...{% endif %}</td>
+                            <td><span class="badge badge-{{ 'fixed' if v.status == 'Fixed' else 'open' }}">{{ v.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-icon">&#128737;</span>
+                <div class="empty-title">No Vulnerabilities Found</div>
+                <div class="empty-desc">Target <strong>{{ scan.target_name }}</strong> appears to be secure</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    async function emailReport(type) {
+        const params = new URLSearchParams(window.location.search);
+        const scanId = params.get('scan_id');
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        try {
+            const resp = await fetch('/send-report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'scan_id=' + scanId + '&type=' + type,
+            });
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                btn.textContent = 'Sent!';
+                btn.style.background = 'rgba(16, 185, 129, 0.15)';
+                btn.style.color = '#10b981';
+                btn.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+            } else {
+                alert('Failed: ' + (data.message || 'unknown'));
+                btn.textContent = type === 'csv' ? 'Email CSV' : 'Email PDF';
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert('Error: ' + e.message);
+            btn.textContent = type === 'csv' ? 'Email CSV' : 'Email PDF';
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
