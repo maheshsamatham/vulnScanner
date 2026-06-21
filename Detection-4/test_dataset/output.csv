@@ -1,0 +1,11 @@
+duration,protocol_type,flag,src_bytes,dst_bytes,count,srv_count,same_srv_rate,diff_srv_rate,dst_host_same_srv_rate,dst_host_srv_count,serror_rate,srv_serror_rate,Attack Type
+28,tcp,SF,329,1063,1,1,1,0,0.23,33,0,0,Normal Instances
+4,tcp,SF,2248,324,1,2,1,0,0.56,154,0,0,Normal Instances
+158,tcp,SF,1567,3095,1,1,1,0,1,2,0,0,U2R Attack
+184,tcp,SF,1511,2957,1,1,1,0,1,3,0,0,U2R Attack
+0,tcp,RSTR,54540,8314,4,4,1, ,1,7,0,0,dos Attack
+0,tcp,SF,54540,8314,5,5,1,0,1,8,0,0,dos Attack
+1,tcp,RSTR,0,0,8,2,0.25,0.5,0.01,2,0,0,probe Attack
+1,tcp,RSTR,0,0,18,2,0.11,0.5,0.01,2,0,0,probe Attack
+31,tcp,SF,1345,10036,1,1,1,0,0,1,0,0,r2l Attack
+0,tcp,SF,613,0,1,2,1,0,1,84,0,0,r2l Attack

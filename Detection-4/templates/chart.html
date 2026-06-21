@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Anomaly Detection in Network Traffic Using Advanced Machine Learning Techniques</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
+    <link rel="stylesheet" href="../static/css/animate.css">
+    
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/magnific-popup.css">
+
+    <link rel="stylesheet" href="../static/css/flaticon.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+  </head>
+  <body>
+  	<div class="wrap">
+			<div class="container">
+				<div class="row justify-content-between">
+						<div class="col-12 col-md d-flex align-items-center">
+							<p class="mb-0 phone"><span class="mailus"></span> <a href="#"></a>  <span class="mailus"></span> <a href="#"></a></p>
+						</div>
+						<div class="col-12 col-md d-flex justify-content-md-end">
+							<div class="social-media">
+				    		<p class="mb-0 d-flex">
+				    			 
+				    		</p>
+			        </div>
+						</div>
+				</div>
+			</div>
+		</div>
+		<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	    <div class="container">
+        <a class="navbar-brand">Anomaly <span>Detection</span></a>
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="fa fa-bars"></span> Menu
+	      </button>
+	      <div class="collapse navbar-collapse" id="ftco-nav">
+	        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active"><a href="{{url_for('index')}}" class="nav-link">Home</a></li>
+	         
+            <li class="nav-item "><a href="{{url_for('upload')}}" class="nav-link">Upload</a></li>
+            <li class="nav-item"><a href="{{url_for('prediction')}}" class="nav-link">Prediction</a></li>
+            <li class="nav-item"><a href="{{url_for('performance')}}" class="nav-link">Performance Analysis</a></li>
+            <li class="nav-item"><a href="{{url_for('chart')}}" class="nav-link">Chart</a></li>
+            <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link">Logout</a></li>
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+    <!-- END nav -->
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('../static/images/attack8.jpg');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-end">
+          <div class="col-md-9 ftco-animate pb-5">
+          	<p class="breadcrumbs mb-2"><span class="mr-2"></span> <span>Static Chart <i class="fa fa-chevron-right"></i></span></p>
+            <h1 class="mb-0 bread">Anomaly Detection</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row justify-content-center pb-5 mb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+          	<span class="subheading">Anomaly Detection</span>
+            <h2>Static Visualization Charts</h2>
+          </div>
+        </div>
+    		 
+
+        <html>
+          <head>
+             <title></title>
+             <script type = "text/javascript" src = "https://www.gstatic.com/charts/loader.js">
+             </script>
+             <script type = "text/javascript">
+                google.charts.load('current', {packages: ['corechart']});     
+             </script>
+          </head>
+          
+          <body>
+		  <h2><center>Accuracy Chart</center></h2>
+             <div id = "container" style = "width: 750px; height: 400px; margin: 0 auto">
+             </div>
+             <script language = "JavaScript">
+                function drawChart() {
+                   // Define the chart to be drawn.
+                   var data = google.visualization.arrayToDataTable([
+                      ['Model', 'Train Accuracy','Test Accuracy'],
+                      ['CatBoostClassifier', 99.9,99.9],
+                      ['ExtraTreeClassifier',  99.9,99.9],
+                      ['GradientBoostingClassifier',  99.8,99.8]
+                     
+                      
+                   ]);
+       
+                   var options = {title: 'accuracy_score'}; 
+       
+                   // Instantiate and draw the chart.
+                   var chart = new google.visualization.BarChart(document.getElementById('container'));
+                   chart.draw(data, options);
+                }
+                google.charts.setOnLoadCallback(drawChart);
+             </script>
+          </body>
+       </html>
+
+       <br>
+       <br>
+       
+	   <h2><center>ROC Graph</center></h2>
+					  <center><div><img style="margin-left:10px;width:800px;height:500px;" src="../static/output.png"</div></center>
+                      </br> </br>
+
+        <head>
+		<h2><center>Dataset Class Distribution Chart</center></h2>
+          <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+          <script type="text/javascript">
+            google.charts.load("current", {packages:["corechart"]});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+              var data = google.visualization.arrayToDataTable([
+                ['class', 'Count'],
+                ['Normal Instances',     30],
+               
+                ['U2R Attack',    5],
+				 ['DOS Attack',    40],
+				  ['Probe Attack',    10],
+				   ['R2L Attack',    15],
+          
+              ]);
+      
+              var options = {
+                title: '',
+                is3D: true,
+              };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+              chart.draw(data, options);
+            }
+          
+          </script>
+        </head>
+        <body>
+         
+		 
+         
+    <center>    <div id="piechart_3d" style="width: 900px; height: 500px; "></div></center>
+         
+		 <div><span style="margin-left:150px;color:red"><font size="12">Protocol Count Chart</font></div>
+					  <center><div><img style="margin-left:10px;width:800px;height:500px;" src="../static/protocol.png"</div></center>
+                      </br> </br>
+		  <div><span style="margin-left:150px;color:red"><font size="12">Flag Count Chart</font></div>
+					  <center> <div><img style="margin-left:10px;width:800px;height:500px;" src="../static/flag.png"</div></center>
+					  </br> </br>
+		 <div><span style="margin-left:150px;color:red"><font size="12">Target Count Chart</font></div>
+					  <center> <div><img style="margin-left:10px;width:800px;height:500px;" src="../static/target.png"</div></center>
+					  </br> </br>
+		<div><span style="margin-left:150px;color:red"><font size="12">Attack Distribution Graph</font></div>
+					  <center><div><img style="margin-left:10px;width:800px;height:500px;" src="../static/attack.png"</div></center>
+                      </br> </br>
+        </body>
+
+
+    	</div>
+    </section>
+ 
+
+    
+
+    <footer class="footer ftco-section">
+			<div class="container">
+			 
+				 
+			</div>
+		</footer>
+    
+  
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+  <script src="../static/js/jquery.min.js"></script>
+  <script src="../static/js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="../static/js/popper.min.js"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <script src="../static/js/jquery.easing.1.3.js"></script>
+  <script src="../static/js/jquery.waypoints.min.js"></script>
+  <script src="../static/js/jquery.stellar.min.js"></script>
+  <script src="../static/js/jquery.animateNumber.min.js"></script>
+  <script src="../static/js/owl.carousel.min.js"></script>
+  <script src="../static/js/jquery.magnific-popup.min.js"></script>
+  <script src="../static/js/scrollax.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="../static/js/google-map.js"></script>
+  <script src="../static/js/main.js"></script>
+    
+    
+  </body>
+</html>

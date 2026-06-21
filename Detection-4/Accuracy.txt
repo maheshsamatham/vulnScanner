@@ -1,0 +1,15 @@
+Anomaly Detection in Network Traffic Using Advanced Machine Learning Techniques
+************************************************************
+Algorithm / Model Used: CatBoost Classifier.
+Accuracy Train Score: 99.9% and 
+Test Score: 99.9%.
+************************************************************
+Algorithm / Model Used: ExtraTree Classifier.
+Accuracy Train Score: 99.9% and 
+Test Score: 99.9%.
+************************************************************
+Algorithm / Model Used: Gradient Boosting Classifier.
+Accuracy Train Score: 99.8% and 
+Test Score: 99.8%.
+
+ 

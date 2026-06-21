@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Anomaly Detection in Network Traffic Using Advanced Machine Learning Techniques</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../static/css/animate.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/magnific-popup.css">
+    <link rel="stylesheet" href="../static/css/flaticon.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    
+    <style>
+/* Form Container Styling */
+.form-container {
+    background-color: #ffffff; /* Adjusted for better contrast */
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 50px;
+    text-align: center; /* Centers form elements */
+}
+
+/* Form Header */
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.form-header p {
+    color: #7f8c8d;
+}
+
+/* Form Elements Styling */
+label {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    text-align: left; /* Ensures labels align correctly */
+}
+
+.form-control, .form-select {
+    height: 50px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #495057;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    width: 100%; /* Ensures elements stretch properly */
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Form Row Styling */
+.form-row {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-group {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-group:last-child {
+    margin-right: 0;
+}
+
+/* Submit Button Styling */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.btn-center {
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+}
+
+/* Navigation and Header Styling */
+.hero-wrap {
+    background-position: center;
+    background-size: cover;
+    background-color: #f8f9fa; /* Adjust background */
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.navbar-brand span {
+    color: #3498db;
+}
+
+.heading-section h2 {
+    color: #2c3e50;
+}
+
+.subheading {
+    color: #3498db;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.form-container {
+    background: linear-gradient(135deg, #3498db, #8e44ad); /* Blue to Purple */
+    color: #fff;
+}
+    </style>
+  </head>
+  <body>
+  	<div class="wrap">
+			<div class="container">
+				<div class="row justify-content-between">
+						<div class="col-12 col-md d-flex align-items-center">
+							<p class="mb-0 phone"><span class="mailus"></span> <a href="#"></a>  <span class="mailus"></span> <a href="#"></a></p>
+						</div>
+						<div class="col-12 col-md d-flex justify-content-md-end">
+							<div class="social-media">
+				    		<p class="mb-0 d-flex">
+				    			 
+				    		</p>
+			        </div>
+						</div>
+				</div>
+			</div>
+		</div>
+		<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	    <div class="container">
+            <a class="navbar-brand">Anomaly <span>Detection</span></a>
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="fa fa-bars"></span> Menu
+	      </button>
+	      <div class="collapse navbar-collapse" id="ftco-nav">
+	        <ul class="navbar-nav ml-auto">
+                <li class="nav-item "><a href="{{url_for('index')}}" class="nav-link">Home</a></li>
+	         
+            <li class="nav-item "><a href="{{url_for('upload')}}" class="nav-link">Upload</a></li>
+            <li class="nav-item"><a href="{{url_for('prediction')}}" class="nav-link">Prediction</a></li>
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('../static/images/attack.png');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-end">
+          <div class="col-md-9 ftco-animate pb-5">
+          	<p class="breadcrumbs mb-2"><span class="mr-2"></span> <span>Prediction <i class="fa fa-chevron-right"></i></span></p>
+            <h1 class="mb-0 bread">Anomaly Detection </h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row justify-content-center pb-5 mb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+          	<span class="subheading">Anomaly Detection </span>
+            <h2>Prediction</h2>
+          </div>
+        </div>
+    		 
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="form-container">
+              <div class="form-header">
+                <h2>Anomaly Detection in Network Traffic</h2>
+                
+              </div>
+              
+              <form method="POST" style="margin-left:100px" action="/predict">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="duration">Duration</label>
+                        <input type="number" class="form-control" name="duration" placeholder="Enter your duration" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="protocol_type">Protocol Type</label>
+                        <select class="form-select" method="post" name="protocol_type" required>
+                            <option value="" disabled selected>Select Protocol Type</option>
+                            <option value="0">icmp</option>
+                            <option value="1">tcp</option>
+                            <option value="2">udp</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="flag">Flag</label>
+                        <select class="form-select" method="post" name="flag" required>
+                            <option value="" disabled selected>Select Flag</option>
+                            <option value="0">SF</option>
+                            <option value="1">S0</option>
+                            <option value="2">REJ</option>
+                            <option value="3">RSTR</option>
+                            <option value="4">RSTO</option>
+                            <option value="5">SH</option>
+                            <option value="6">S1</option>
+                            <option value="7">S2</option>
+                            <option value="8">RSTOS0</option>
+                            <option value="9">S3</option>
+                            <option value="10">OTH</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="src_bytes">src_bytes</label>
+                        <input type="number" class="form-control" name="src_bytes" placeholder="src_bytes" step="any" required>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="dst_bytes">dst_bytes</label>
+                        <input type="number" class="form-control" name="dst_bytes" placeholder="dst_bytes" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="count">count</label>
+                        <input type="number" class="form-control" name="count" placeholder="count"  step="any" required>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="srv_count">srv_count</label>
+                        <input type="number" class="form-control" name="srv_count" placeholder="srv_count" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="same_srv_rate">same_srv_rate</label>
+                        <input type="number" class="form-control" name="same_srv_rate" placeholder="same_srv_rate" step="any" required>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="diff_srv_rate">diff_srv_rate</label>
+                        <input type="number" class="form-control" name="diff_srv_rate" placeholder="diff_srv_rate" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="dst_host_same_srv_rate">dst_host_same_srv_rate</label>
+                        <input type="number" class="form-control" name="dst_host_same_srv_rate" placeholder="dst_host_same_srv_rate" step="any" required>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="dst_host_srv_count">dst_host_srv_count</label>
+                        <input type="number" class="form-control" name="dst_host_srv_count" placeholder="dst_host_srv_count" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="serror_rate">serror_rate</label>
+                        <input type="number" class="form-control" name="serror_rate" placeholder="serror_rate" step="any" required>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="srv_serror_rate">srv_serror_rate</label>
+                        <input type="number" class="form-control" name="srv_serror_rate" placeholder="srv_serror_rate" step="any" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Model" class="form-label">Prediction Model</label>
+                        <select class="form-select" id="Model" name="Model" required>
+                            <option value="" disabled selected>Select Model</option>
+                            <option value="CatBoostClassifier">CatBoost Classifier</option>
+                            <option value="ExtraTreeClassifier">ExtraTree Classifier</option>
+                            <option value="GradientBoostingClassifier">Gradient Boosting Classifier</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="btn-center">
+                    <button type="submit" style="margin-left:10px" class="btn btn-primary btn-lg">Submit</button>
+                </div>
+            </form>
+                        </div>
+          </div>
+        </div>
+    	</div>
+    </section>
+
+    <footer class="footer ftco-section">
+			<div class="container">
+				
+			</div>
+		</footer>
+    
+    <!-- loader -->
+    <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/jquery-migrate-3.0.1.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.easing.1.3.js"></script>
+    <script src="../static/js/jquery.waypoints.min.js"></script>
+    <script src="../static/js/jquery.stellar.min.js"></script>
+    <script src="../static/js/jquery.animateNumber.min.js"></script>
+    <script src="../static/js/owl.carousel.min.js"></script>
+    <script src="../static/js/jquery.magnific-popup.min.js"></script>
+    <script src="../static/js/scrollax.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+    <script src="../static/js/google-map.js"></script>
+    <script src="../static/js/main.js"></script>
+  </body>
+</html>
